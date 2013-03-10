@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://autogroup/locale/options.dtd">
+<prefwindow id="autogroup-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+  title="&prefwindow.title;" buttons="accept, cancel" ondialogaccept="return autoGroupOpts.accept();" ondialogcancel="return autoGroupOpts.discard();">
+  <script src='options.js' />
+  <prefpane id="pane1" style='min-height: 540px; min-width: 360px;' label="&pane1.title;">
+    <stringbundleset id="autogroup-opts-stringbundleset">
+      <stringbundle id="autogroup-opts-string-bundle" src="chrome://autogroup/locale/overlay.properties"/>
+    </stringbundleset>
+    <label accesskey="&grouplist.accesskey;" control="group-list">&grouplist.label;</label>
+     <!-- Group list -->
+      <tree id="group-list" rows="12" flex="1" hidecolumnpicker="true" seltype="single" class="tree" onselect='autoGroupOpts.treeItemSelected(this);'>
+	<treecols>
+	  <treecol primary="true" ordinal="1" flex="1" label='&grouplist.label;' />
+	</treecols>
+	<treechildren id='group-tree'>
+	</treechildren>
+      </tree>
+      <hbox align="right">
+	<!-- Move selected element up -->
+	<button label="&grouplist.moveup;" id='btn-up' oncommand="autoGroupOpts.listMoveUp(document.getElementById('group-list'))" />
+	<!-- Move selected element down -->
+	<button label="&grouplist.movedown;" id='btn-down' oncommand="autoGroupOpts.listMoveDown(document.getElementById('group-list'))" />
+	<!-- Remove selected element -->
+	<button label="&grouplist.remove;" id='btn-remove' icon="remove" oncommand="" />
+      </hbox>
+      <!-- Name-editing textbox -->
+      <label control='object_name' id='obj-name'>&epan.groupname;</label>
+      <textbox id='object_name' />
+      <!-- Filter-related box -->
+      <vbox id='filter-box'>
+	<hbox>
+	  <!-- Match type groupbox -->
+	  <groupbox>
+	    <caption label='&filter.match;' />
+	    <radiogroup id='match-select'>
+	      <radio label='&filter.regex;' value='0' />
+	      <radio label='&filter.fulltext;' value='1' selected='true' />
+	    </radiogroup>
+	  </groupbox>
+	  <!-- Search type groupbox -->
+	  <groupbox>
+	    <caption label='&filter.search;' />
+	    <radiogroup id='search-select'>
+	      <radio label='&filter.url;' value='0' selected='true' />
+	      <radio label='&filter.title;' value='1' />
+	    </radiogroup>
+	  </groupbox>
+	</hbox>
+	<label control='f_expression'>&filter.expression;</label>
+	<textbox id='f_expression' />
+      </vbox>
+      <!-- Add/Save button -->
+      <hbox align="right">
+	<button label="&epan.addnew;" id='addsave' icon='add' oncommand="" />
+      </hbox>
+  </prefpane>
+  <script type='text/javascript'>
+    var f;
+    window.addEventListener("load", f=function(){
+      var instant = document.getElementById('autogroup-preferences').instantApply;
+      autoGroupOpts.immediateState(instant);
+      var tr = document.getElementById('group-list');
+      tr.disabled = true;
+      autoGroupOpts.buildList(tr);
+      tr.disabled = false;
+      tr.view.selection.select(tr.view.rowCount-1);
+      window.removeEventListener("load", f, true);
+    }, true);
+  </script>
+</prefwindow>
+

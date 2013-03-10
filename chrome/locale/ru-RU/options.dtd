@@ -1,0 +1,22 @@
+<!ENTITY prefwindow.title "Настройки AutoGroup">
+<!ENTITY pane1.title "Настройки AutoGroup">
+
+<!ENTITY grouplist.label "Группы">
+<!ENTITY grouplist.accesskey "Г">
+<!ENTITY grouplist.moveup "Вверх">
+<!ENTITY grouplist.movedown "Вниз">
+<!ENTITY grouplist.remove "Удалить">
+<!ENTITY grouplist.new "Добавить">
+
+<!ENTITY epan.groupname "Имя группы">
+<!ENTITY epan.filtername "Имя фильтра">
+<!ENTITY epan.addnew "Добавить">
+<!ENTITY epan.save "Сохранить">
+
+<!ENTITY filter.match "Тип совпадения">
+<!ENTITY filter.search "Совпадение в">
+<!ENTITY filter.regex "Регулярное выражение">
+<!ENTITY filter.fulltext "Текст">
+<!ENTITY filter.url "URL">
+<!ENTITY filter.title "Заголовке">
+<!ENTITY filter.expression "Выражение">

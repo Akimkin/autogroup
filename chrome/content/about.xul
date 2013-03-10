@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<!DOCTYPE dialog SYSTEM "chrome://autogroup/locale/about.dtd">
+
+<dialog title="&about; AutoGroup" orient="vertical" autostretch="always" buttons="accept" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <stringbundleset id="autogroup-about-stringbundleset">
+    <stringbundle id="autogroup-about-string-bundle" src="chrome://autogroup/locale/overlay.properties"/>
+  </stringbundleset>
+  <groupbox align="center" orient="horizontal">
+    <vbox>
+      <text value="AutoGroup" style="font-weight: bold; font-size: 16pt;"/>
+      <text value="&version; 0.3"/>
+      <separator class="thin"/>
+      <text id='desc-text' />
+      <separator class="groove"/>
+      <text value="&createdBy;" style="font-weight: bold;"/>
+      <text value="Denis Akimkin"/>
+      <separator class="thin"/>
+    </vbox>
+  </groupbox>
+  <script>
+    var f;
+    document.addEventListener("load", f=function(){
+     document.getElementById('desc-text').setAttribute('value', document.getElementById('string-bundle').getString('extensions.akimkin_denis@mail.ru.description'));
+     sizeToContent();
+     document.removeEventListener("load", f, true);
+    },true);
+  </script>
+</dialog>

@@ -1,0 +1,22 @@
+<!ENTITY prefwindow.title "AutoGroup settings">
+<!ENTITY pane1.title "AutoGroup settings">
+
+<!ENTITY grouplist.label "Groups">
+<!ENTITY grouplist.accesskey "G">
+<!ENTITY grouplist.moveup "Up">
+<!ENTITY grouplist.movedown "Down">
+<!ENTITY grouplist.remove "Remove">
+<!ENTITY grouplist.new "New">
+
+<!ENTITY epan.groupname "Group name">
+<!ENTITY epan.filtername "Filter name">
+<!ENTITY epan.addnew "Add">
+<!ENTITY epan.save "Save">
+
+<!ENTITY filter.match "Match type">
+<!ENTITY filter.search "Match in">
+<!ENTITY filter.regex "Regular expression">
+<!ENTITY filter.fulltext "Text match">
+<!ENTITY filter.url "URL">
+<!ENTITY filter.title "Title">
+<!ENTITY filter.expression "Expression">

@@ -1,0 +1,22 @@
+<!ENTITY prefwindow.title "Параметри AutoGroup">
+<!ENTITY pane1.title "Параметри AutoGroup">
+
+<!ENTITY grouplist.label "Групи">
+<!ENTITY grouplist.accesskey "Г">
+<!ENTITY grouplist.moveup "Вгору">
+<!ENTITY grouplist.movedown "Вниз">
+<!ENTITY grouplist.remove "Видалити">
+<!ENTITY grouplist.new "Додати">
+
+<!ENTITY epan.groupname "Назва групи">
+<!ENTITY epan.filtername "Назва фільтру">
+<!ENTITY epan.addnew "Додати">
+<!ENTITY epan.save "Зберегти">
+
+<!ENTITY filter.match "Тип пошуку">
+<!ENTITY filter.search "Шукати у">
+<!ENTITY filter.regex "Регулярний вираз">
+<!ENTITY filter.fulltext "Текст">
+<!ENTITY filter.url "URL">
+<!ENTITY filter.title "Заголовку">
+<!ENTITY filter.expression "Вираз">

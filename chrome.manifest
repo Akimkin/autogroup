@@ -1,0 +1,9 @@
+content   autogroup                 chrome/content/
+skin      autogroup   classic/1.0   chrome/skin/
+locale    autogroup   en-US         chrome/locale/en-US/
+locale    autogroup   ru-RU         chrome/locale/ru-RU/
+locale    autogroup   uk-UA         chrome/locale/uk-UA/
+
+resource  autogroup   modules/
+overlay   chrome://browser/content/browser.xul   chrome://autogroup/content/ff-overlay.xul
+style chrome://global/content/customizeToolbar.xul chrome://autogroup/skin/overlay.css
