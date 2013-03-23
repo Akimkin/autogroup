@@ -4,7 +4,7 @@
     <em:id>akimkin_denis@mail.ru</em:id>
     <em:type>2</em:type>
     <em:name>AutoGroup</em:name>
-    <em:version>0.3</em:version>
+    <em:version>0.3.1</em:version>
     <em:creator>Denis Akimkin</em:creator>
     <em:contributor>brunoais</em:contributor>
     <em:description>Automatically group tabs for Firefox Panorama by patterns.</em:description>
