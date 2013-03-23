@@ -2,8 +2,8 @@
 <?xml-stylesheet href="chrome://autogroup/skin/overlay.css" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://autogroup/locale/overlay.dtd">
 <overlay id="autogroup-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script src="overlay.js"/>
-  <script src="ff-overlay.js"/>
+  <script type="application/javascript;version=1.7" src="overlay.js"/>
+  <script type="application/javascript;version=1.7" src="ff-overlay.js"/>
 
   <stringbundleset id="stringbundleset">
     <stringbundle id="autogroup-strings" src="chrome://autogroup/locale/overlay.properties"/>

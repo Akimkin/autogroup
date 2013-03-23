@@ -27,7 +27,6 @@ if("undefined" === typeof(autogroup)){
     // initialization code
     this.initialized = true;
     this.strings = document.getElementById("autogroup-strings");
-    window.parent.TabView._initFrame();
     gBrowser.tabContainer.addEventListener("TabOpen", autogroup.onTabOpen, false);
     gBrowser.tabContainer.addEventListener("TabClose", autogroup.onTabClose, false);
   };
@@ -40,10 +39,11 @@ if("undefined" === typeof(autogroup)){
     // Filter group types
     const FILTER_URI = 0;
     const FILTER_TITLE = 1;
-    
+
     var groups = autoGroupSettings.data();
-    window.parent.TabView._initFrame();
-    
+    window.TabView._initFrame();
+    contentWindow = window.TabView.getContentWindow();
+
     if( "undefined" !== typeof groups )
     {
       for(var i = 0; i < groups.length; i++)
@@ -82,10 +82,10 @@ if("undefined" === typeof(autogroup)){
 	  if(!mv) continue;
 	  // Move tab
 	  var g;
-	  var eg = window.parent.TabView.getContentWindow().GroupItems.groupItems.filter(function(groupItem){ return groupItem.getTitle() == groups[i].groupName });
+	  var eg = contentWindow.GroupItems.groupItems.filter(function(groupItem){ return groupItem.getTitle() == groups[i].groupName });
 	  if(eg.length == 0)
 	  {
-	    g = window.parent.TabView.getContentWindow().GroupItems.newGroup();
+	    g = contentWindow.GroupItems.newGroup();
 	    g.setTitle(groups[i].groupName);
 	  }else
 	    g = eg[0]
