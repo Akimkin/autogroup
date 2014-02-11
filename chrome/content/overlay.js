@@ -78,7 +78,9 @@ if("undefined" === typeof(autogroup)){
 	      mv = true;
 	    break;
 	  }
-	  // No filter match - continue
+	  // If mv and groupname = '#CURRENT#', do not move
+	  if ((mv) && (groups[i].groupName=="#CURRENT#")) return true;
+          // No filter match - continue
 	  if(!mv) continue;
 	  // Move tab
 	  var g;
