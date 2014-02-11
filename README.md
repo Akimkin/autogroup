@@ -17,3 +17,5 @@ If you want to explicitly define default group for tabs that don't match any oth
  - Match type: regular expression
  - Search in: any
  - Expression: .* 
+
+Together with the previous default group, tab that does match a group filter with group name equal to #CURRENT# will be opened in current active group (this group must be placed just before the default group).
