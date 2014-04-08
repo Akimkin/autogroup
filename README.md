@@ -1,3 +1,10 @@
+# Experimental branch
+**WARNING!** This is experimental branch of AutoGroup add-on for Firefox web browser.
+It's used for testing features that are not implemented completely or correctly and therefore can be buggy or unstable.
+Once considered complete, feature will land in master branch and go to stable release posted to addons.mozilla.org.
+# The complete implementation of particular feature may be incompatible with one in experimental branch.
+# Please, follow the changelog when using experimental branches.
+
 Automatically group tabs in Firefox Panorama by URL or page title matching regular expression pattern or containing specific text. 
 You can specify multiple 'filters' (rules of tab-filtering) to each group.
 
@@ -18,4 +25,4 @@ If you want to explicitly define default group for tabs that don't match any oth
  - Search in: any
  - Expression: .* 
 
-Together with the previous default group, tab that does match a group filter with group name equal to #CURRENT# will be opened in current active group (this group must be placed just before the default group).
+Together with the previous default group, tab that does match a group filter with group name equal to #CURRENT# will be opened in current active group (this group must be placed **first**).
