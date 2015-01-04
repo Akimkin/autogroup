@@ -1,6 +1,7 @@
 <!ENTITY prefwindow.title "Параметри AutoGroup">
-<!ENTITY pane1.title "Параметри AutoGroup">
 
+<!-- Group Filters pane -->
+<!ENTITY pane-groups.title "Параметри AutoGroup">
 <!ENTITY grouplist.label "Групи">
 <!ENTITY grouplist.accesskey "Г">
 <!ENTITY grouplist.moveup "Вгору">
@@ -20,3 +21,8 @@
 <!ENTITY filter.url "URL">
 <!ENTITY filter.title "Заголовку">
 <!ENTITY filter.expression "Вираз">
+
+<!-- Do-not-group pane -->
+<!ENTITY pane-nogroup.title "Не групувати">
+<!ENTITY nogrouplist.explain "Вкладки, що підходять цим фільтрам буде відкрито у поточній групі">
+<!ENTITY nogrouplist.label "Фільтри">

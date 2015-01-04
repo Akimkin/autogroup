@@ -1,6 +1,7 @@
 <!ENTITY prefwindow.title "AutoGroup settings">
-<!ENTITY pane1.title "AutoGroup settings">
 
+<!-- Group Filters pane -->
+<!ENTITY pane-groups.title "Group Filters">
 <!ENTITY grouplist.label "Groups">
 <!ENTITY grouplist.accesskey "G">
 <!ENTITY grouplist.moveup "Up">
@@ -20,3 +21,8 @@
 <!ENTITY filter.url "URL">
 <!ENTITY filter.title "Title">
 <!ENTITY filter.expression "Expression">
+
+<!-- Do-not-group pane -->
+<!ENTITY pane-nogroup.title "Do Not Group">
+<!ENTITY nogrouplist.explain "The tabs matching following filters will always open icurrent group">
+<!ENTITY nogrouplist.label "Filters">
