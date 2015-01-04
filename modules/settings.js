@@ -2,7 +2,6 @@ var EXPORTED_SYMBOLS = ["autoGroupSettings"];
 
 /**
  * autoGroupSettings module
- * TODO: check whether the replace of typeof-checks with === against undefined is sufficient
  */
 if ("undefined" === typeof autoGroupSettings) {
     var autoGroupSettings = {};
