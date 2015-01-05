@@ -2,139 +2,143 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://autogroup/locale/options.dtd">
 <prefwindow id="autogroup-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-  title="&prefwindow.title;" buttons="accept, cancel" ondialogaccept="return autoGroupOpts.accept();" ondialogcancel="return autoGroupOpts.discard();">
-  <stringbundleset id="autogroup-opts-stringbundleset">
-    <stringbundle id="autogroup-opts-string-bundle" src="chrome://autogroup/locale/overlay.properties"/>
-  </stringbundleset>
+    title="&prefwindow.title;" buttons="accept, cancel" ondialogaccept="return autoGroupOpts.accept();" ondialogcancel="return autoGroupOpts.discard();">
+    <stringbundleset id="autogroup-opts-stringbundleset">
+        <stringbundle id="autogroup-opts-string-bundle" src="chrome://autogroup/locale/overlay.properties"/>
+    </stringbundleset>
 
-  <script src='options.js' />
+    <script src='options.js' />
 
-  <!-- Group filters pane -->
-  <prefpane id="autogroup-pane-groups" image='chrome://autogroup/skin/view-group.png' label="&pane-groups.title;">
-    <label accesskey="&grouplist.accesskey;" control="group-list">&grouplist.label;</label>
-      <!-- Group list -->
-      <tree id="group-list" rows="12" flex="1" hidecolumnpicker="true" seltype="single" class="tree" onselect='autoGroupOpts.treeItemSelected(this);'>
-	<treecols>
-	  <treecol primary="true" ordinal="1" flex="1" label='&grouplist.label;' />
-	</treecols>
-	<treechildren id='group-tree'>
-	</treechildren>
-      </tree>
+    <!-- Group filters pane -->
+    <prefpane id="autogroup-pane-groups" image='chrome://autogroup/skin/view-group.png' label="&pane-groups.title;">
+        <label accesskey="&grouplist.accesskey;" control="group-list">&grouplist.label;</label>
+        <!-- Group list -->
+        <tree id="group-list" rows="12" flex="1" hidecolumnpicker="true" seltype="single" class="tree" onselect='autoGroupOpts.treeItemSelected(this);'>
+            <treecols>
+                <treecol primary="true" ordinal="1" flex="1" label='&grouplist.label;' />
+            </treecols>
+            <treechildren id='group-tree'>
+            </treechildren>
+        </tree>
 
-      <!-- Buttons -->
-      <hbox align="right">
-	<!-- Move selected element up -->
-	<button label="&grouplist.moveup;" id='btn-group-up'
-            oncommand="autoGroupOpts.treeMoveUp('//xul:prefpane[@id=\'autogroup-pane-groups\']/xul:tree[@id=\'group-list\']')" />
-	<!-- Move selected element down -->
-	<button label="&grouplist.movedown;" id='btn-group-down'
-            oncommand="autoGroupOpts.treeMoveDown('//xul:prefpane[@id=\'autogroup-pane-groups\']/xul:tree[@id=\'group-list\']')" />
-	<!-- Remove selected element -->
-	<button label="&grouplist.remove;" id='btn-group-remove' icon="remove" oncommand="" />
-      </hbox>
+        <!-- Buttons -->
+        <hbox align="right">
+        <!-- Move selected element up -->
+            <button label="&grouplist.moveup;" id='btn-group-up'
+                            oncommand="autoGroupOpts.treeMoveUp('//xul:prefpane[@id=\'autogroup-pane-groups\']/xul:tree[@id=\'group-list\']')" />
+            <!-- Move selected element down -->
+            <button label="&grouplist.movedown;" id='btn-group-down'
+                            oncommand="autoGroupOpts.treeMoveDown('//xul:prefpane[@id=\'autogroup-pane-groups\']/xul:tree[@id=\'group-list\']')" />
+            <!-- Remove selected element -->
+            <button label="&grouplist.remove;" id='btn-group-remove' icon="remove" oncommand="" />
+        </hbox>
 
-      <!-- Name-editing textbox -->
-      <label control='object_name' id='obj-name'>&epan.groupname;</label>
-      <textbox id='object_name' />
+        <!-- Name-editing textbox -->
+        <label control='object_name' id='obj-name'>&epan.groupname;</label>
+        <textbox id='object_name' />
 
-      <!-- Filter-related box -->
-      <vbox id='filter-box'>
-	<hbox>
-	  <!-- Match type groupbox -->
-	  <groupbox>
-	    <caption label='&filter.match;' />
-	    <radiogroup id='match-select'>
-	      <radio label='&filter.regex;' value='0' />
-	      <radio label='&filter.fulltext;' value='1' selected='true' />
-	    </radiogroup>
-	  </groupbox>
-	  <!-- Search type groupbox -->
-	  <groupbox>
-	    <caption label='&filter.search;' />
-	    <radiogroup id='search-select'>
-	      <radio label='&filter.url;' value='0' selected='true' />
-	      <radio label='&filter.title;' value='1' />
-	    </radiogroup>
-	  </groupbox>
-	</hbox>
-	<label control='f_expression'>&filter.expression;</label>
-	<textbox id='f_expression' />
-      </vbox>
+        <!-- Filter-related box -->
+        <vbox id='filter-box'>
+            <hbox>
+                <!-- Match type groupbox -->
+                <groupbox>
+                    <caption label='&filter.match;' />
+                    <radiogroup id='match-select'>
+                        <radio label='&filter.regex;' value='0' />
+                        <radio label='&filter.fulltext;' value='1' selected='true' />
+                    </radiogroup>
+                </groupbox>
+                <!-- Search type groupbox -->
+                <groupbox>
+                    <caption label='&filter.search;' />
+                    <radiogroup id='search-select'>
+                        <radio label='&filter.url;' value='0' selected='true' />
+                        <radio label='&filter.title;' value='1' />
+                    </radiogroup>
+                </groupbox>
+            </hbox>
+            <label control='f_expression'>&filter.expression;</label>
+            <textbox id='f_expression' />
+        </vbox>
 
-      <!-- Add/Save button -->
-      <hbox align="right">
-	<button label="&epan.addnew;" id='btn-group-addsave' icon='add' oncommand="" />
-      </hbox>
-  </prefpane>
+        <!-- Add/Save button -->
+        <hbox align="right">
+           <button label="&epan.addnew;" id='btn-group-addsave' icon='add' oncommand="" />
+        </hbox>
+    </prefpane>
 
-  <!-- Do-not-group filters pane -->
-  <prefpane id="autogroup-pane-nogroup" image='chrome://autogroup/skin/view-nogroup.png' label="&pane-nogroup.title;">
-    <label accesskey="&grouplist.accesskey;" control="nogroup-list">&nogrouplist.label;</label>
-    <listbox id="nogroup-list" rows="12" flex="1" hidecolumnpicker="true" seltype="single" class="tree" onselect='autoGroupOpts.treeItemSelected(this);'>
-      <listhead>
-        <listheader label="&grouplist.label;" />
-      </listhead>
-      <listcols>
-        <listcol flex="1" />
-      </listcols>
-    </listbox>
-    <!-- Buttons -->
-    <hbox align="right">
-      <!-- Move selected element up -->
-      <button label="&grouplist.moveup;" id='btn-nogroup-up'
-              oncommand="autoGroupOpts.listMoveUp('//xul:prefpane[@id=\'autogroup-pane-nogroup\']/xul:listbox[@id=\'nogroup-list\']')" />
-      <!-- Move selected element down -->
-      <button label="&grouplist.movedown;" id='btn-nogroup-down'
-              oncommand="autoGroupOpts.listMoveDown('//xul:prefpane[@id=\'autogroup-pane-nogroup\']/xul:listbox[@id=\'nogroup-list\']')" />
-      <!-- Remove selected element -->
-      <button label="&grouplist.remove;" id='btn-nogroup-remove' icon="remove" oncommand="" />
-    </hbox>
+    <!-- Do-not-group filters pane -->
+    <prefpane id="autogroup-pane-nogroup" image='chrome://autogroup/skin/view-nogroup.png' label="&pane-nogroup.title;">
+        <label accesskey="&grouplist.accesskey;" control="nogroup-list">&nogrouplist.label;</label>
+        <listbox id="nogroup-list" rows="12" flex="1" hidecolumnpicker="true" seltype="single" class="tree" onselect='autoGroupOpts.treeItemSelected(this);'>
+            <listhead>
+                <listheader label="&grouplist.label;" />
+            </listhead>
+            <listcols>
+                <listcol flex="1" />
+            </listcols>
+        </listbox>
+        <!-- Buttons -->
+        <hbox align="right">
+            <!-- Move selected element up -->
+            <button label="&grouplist.moveup;" id='btn-nogroup-up'
+                            oncommand="autoGroupOpts.listMoveUp('//xul:prefpane[@id=\'autogroup-pane-nogroup\']/xul:listbox[@id=\'nogroup-list\']')" />
+            <!-- Move selected element down -->
+            <button label="&grouplist.movedown;" id='btn-nogroup-down'
+                            oncommand="autoGroupOpts.listMoveDown('//xul:prefpane[@id=\'autogroup-pane-nogroup\']/xul:listbox[@id=\'nogroup-list\']')" />
+            <!-- Remove selected element -->
+            <button label="&grouplist.remove;" id='btn-nogroup-remove' icon="remove" oncommand="" />
+        </hbox>
 
-    <!-- Filter-related box -->
-    <vbox id='filter-box'>
-      <hbox>
-        <!-- Match type groupbox -->
-        <groupbox>
-          <caption label='&filter.match;' />
-          <radiogroup id='match-select'>
-            <radio label='&filter.regex;' value='0' />
-            <radio label='&filter.fulltext;' value='1' selected='true' />
-          </radiogroup>
-        </groupbox>
-        <!-- Search type groupbox -->
-        <groupbox>
-          <caption label='&filter.search;' />
-          <radiogroup id='search-select'>
-            <radio label='&filter.url;' value='0' selected='true' />
-            <radio label='&filter.title;' value='1' />
-          </radiogroup>
-        </groupbox>
-      </hbox>
-      <label control='f_expression'>&filter.expression;</label>
-      <textbox id='f_expression' />
-    </vbox>
+        <!-- Name-editing textbox -->
+        <label control='object_name' id='obj-name'>&epan.groupname;</label>
+        <textbox id='object_name' />
 
-    <!-- Add/Save button -->
-    <hbox align="right">
-      <button label="&epan.addnew;" id='btn-nogroup-addsave' icon='add' oncommand="" />
-    </hbox>
-  </prefpane>
+        <!-- Filter-related box -->
+        <vbox id='filter-box'>
+            <hbox>
+                <!-- Match type groupbox -->
+                <groupbox>
+                    <caption label='&filter.match;' />
+                    <radiogroup id='match-select'>
+                        <radio label='&filter.regex;' value='0' />
+                        <radio label='&filter.fulltext;' value='1' selected='true' />
+                    </radiogroup>
+                </groupbox>
+                <!-- Search type groupbox -->
+                <groupbox>
+                    <caption label='&filter.search;' />
+                    <radiogroup id='search-select'>
+                        <radio label='&filter.url;' value='0' selected='true' />
+                        <radio label='&filter.title;' value='1' />
+                    </radiogroup>
+                </groupbox>
+            </hbox>
+            <label control='f_expression'>&filter.expression;</label>
+            <textbox id='f_expression' />
+        </vbox>
 
-  <script type='text/javascript'>
-    var f;
-    window.addEventListener("load", f=function(){
-      var instant = document.getElementById('autogroup-preferences').instantApply;
-      autoGroupOpts.immediateState(instant);
-      var tr = document.getElementById('group-list');
-      tr.disabled = true;
-      autoGroupOpts.buildTree(tr);
-      tr.disabled = false;
-      var nsResolver = function(x) { return "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";}
-      var groupListIter = document.evaluate('//xul:tree[@id="group-list"]', document, nsResolver, XPathResult.ANY_TYPE, null);
-      console.log(groupListIter.iterateNext());
-      tr.view.selection.select(tr.view.rowCount-1);
-      window.removeEventListener("load", f, true);
-    }, true);
-  </script>
+        <!-- Add/Save button -->
+        <hbox align="right">
+            <button label="&epan.addnew;" id='btn-nogroup-addsave' icon='add' oncommand="" />
+        </hbox>
+    </prefpane>
+
+    <script type='text/javascript'>
+        var f;
+        window.addEventListener("load", f = function() {
+            var instant = document.getElementById('autogroup-preferences').instantApply;
+            autoGroupOpts.immediateState(instant);
+            var tr = document.getElementById('group-list');
+            tr.disabled = true;
+            autoGroupOpts.buildTree(tr);
+            tr.disabled = false;
+            var nsResolver = function(x) { return "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";}
+            var groupListIter = document.evaluate('//xul:tree[@id="group-list"]', document, nsResolver, XPathResult.ANY_TYPE, null);
+            console.log(groupListIter.iterateNext());
+            tr.view.selection.select(tr.view.rowCount-1);
+            window.removeEventListener("load", f, true);
+        }, true);
+    </script>
 </prefwindow>
 
