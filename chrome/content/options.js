@@ -5,8 +5,7 @@ if("undefined" === typeof(autoGroupOpts)){
  var autoGroupOpts = {};
 
 (function(){
-  // TODO: assign list objects to settings, Up/Down/Add/Del should be wrapped
-  // independently to list type.
+  // TODO: assign list objects to settings, Up/Down/Add/Del should be wrapped independently to list type.
 
   /**
    * Settings manager object
@@ -14,17 +13,19 @@ if("undefined" === typeof(autoGroupOpts)){
   var settings = autoGroupSettings;
 
   // Check for correct settings
-  if(false === settings.groupFilters.load()){
-    alert("Failed to parse group list!");
-    return;
+  try {
+      settings.getFilterObject("group").load();
+  } catch (e) {
+      alert("Failed to parse group list!");
+      return;
   }
 
-  if(false === settings.noGroupFilters.load()){
-    alert("Failed to parse nogroup list!");
-    return;
+  try {
+      settings.getFilterObject("nogroup").load();
+  } catch (e) {
+      alert("Failed to parse nogroup list!");
+      return;
   }
-
-  // TODO: load nogroup settings
 
   /**
    * Immediate apply
@@ -129,7 +130,7 @@ if("undefined" === typeof(autoGroupOpts)){
   * @param tree - groups TreeView
   */
   this.buildTree = function(tree){
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
 
     // Actions hereinafter (in this function) are performed only with tree's 'treechildren'
@@ -199,12 +200,12 @@ if("undefined" === typeof(autoGroupOpts)){
   * */
   this.treeAddGroup = function(tree){
     // Get group data
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
     
     // Add new group and save it to preferences
     data.push({'groupName': document.getElementById('object_name').value, 'groupFilters': []});
-    settings.groupFilters.save(data, immediate);
+    settings.getFilterObject("group").save(data, immediate);
 
     tree.disabled = true;
     // Rebuild list
@@ -218,7 +219,7 @@ if("undefined" === typeof(autoGroupOpts)){
   * */
   this.treeSaveGroup = function(tree){
     // Get group data
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
     
     var c = tree.currentIndex;
@@ -240,7 +241,7 @@ if("undefined" === typeof(autoGroupOpts)){
   * */
   this.treeDelGroup = function(tree){
     // Get group data
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
     var c = tree.currentIndex;
     // Find group index
@@ -254,7 +255,7 @@ if("undefined" === typeof(autoGroupOpts)){
     }
     // Remove group and save options
     data.splice(p, 1);
-    settings.groupFilters.save(data, immediate);
+    settings.getFilterObject("group").save(data, immediate);
 
     tree.disabled = true;
     // Rebuild list
@@ -269,7 +270,7 @@ if("undefined" === typeof(autoGroupOpts)){
   * */
   this.treeAddFilter = function(tree){
     // Get group data
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
  
     var fExp = document.getElementById('f_expression').value;
@@ -285,7 +286,7 @@ if("undefined" === typeof(autoGroupOpts)){
       'fCheck': fExp
     });
     // Save data
-    settings.groupFilters.save(data, immediate);
+    settings.getFilterObject("group").save(data, immediate);
 
     tree.disabled = true;
     // Rebuild list
@@ -299,7 +300,7 @@ if("undefined" === typeof(autoGroupOpts)){
   * */
   this.treeSaveFilter = function(tree){
     // Get group data
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
  
     var c = tree.currentIndex;
@@ -311,7 +312,7 @@ if("undefined" === typeof(autoGroupOpts)){
     cf.fgType = document.getElementById('search-select').selectedIndex;
     cf.fCheck = document.getElementById('f_expression').value;
     // Save data
-    settings.groupFilters.save(data, immediate);
+    settings.getFilterObject("group").save(data, immediate);
 
     tree.disabled = true;
     // Rebuild list
@@ -325,15 +326,15 @@ if("undefined" === typeof(autoGroupOpts)){
   * */
   this.treeDelFilter = function(tree){
     // Get group data
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
 
     var c = tree.currentIndex;
     var p = dTree.groupIndex(c);
     // Remove selected filter
-    data[p].groupFilters.splice(tree.currentIndex-tree.view.getParentIndex(tree.currentIndex)-1, 1);
+    data[p].getFilterObject("group").splice(tree.currentIndex-tree.view.getParentIndex(tree.currentIndex)-1, 1);
     // Save data
-    settings.groupFilters.save(data, immediate);
+    settings.getFilterObject("group").save(data, immediate);
 
     tree.disabled = true;
     // Rebuild list
@@ -366,7 +367,7 @@ if("undefined" === typeof(autoGroupOpts)){
     }
 
     // Get group data.
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
 
 
@@ -434,7 +435,7 @@ if("undefined" === typeof(autoGroupOpts)){
   * */
   this.treeMoveUp = function(tree_path){
     // Get group data
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
 
     var tree = docElement.get(window.document, tree_path);
@@ -465,7 +466,7 @@ if("undefined" === typeof(autoGroupOpts)){
     }
     
     // Save data
-    settings.groupFilters.save(data, immediate);
+    settings.getFilterObject("group").save(data, immediate);
 
     tree.disabled = true;
     // Rebuild list
@@ -480,7 +481,7 @@ if("undefined" === typeof(autoGroupOpts)){
   * */
   this.treeMoveDown = function(tree_path){
     // Get group data
-    var data = settings.groupFilters.data();
+    var data = settings.getFilterObject("group").data();
     if(typeof(data) === "undefined") return;
 
     var tree = docElement.get(window.document, tree_path);
@@ -514,7 +515,7 @@ if("undefined" === typeof(autoGroupOpts)){
     }
     
     // Save data
-    settings.groupFilters.save(data, immediate);
+    settings.getFilterObject("group").save(data, immediate);
 
     tree.disabled = true;
     // Rebuild list
@@ -529,9 +530,12 @@ if("undefined" === typeof(autoGroupOpts)){
   this.listMoveDown = function(list_path){
   };
 
+  this.listItemSelected = function(list) {
+  };
+
   this.accept = function(){
     try {
-      settings.groupFilters.commit(settings.groupFilters.data());
+      settings.getFilterObject("group").commit(/*settings.getFilterObject("group").data()*/);
     } catch(e) {
       alert("Failed to save settings (" + e + ")!");
       return false;
@@ -540,7 +544,7 @@ if("undefined" === typeof(autoGroupOpts)){
   };
   
   this.discard = function(){
-    if(false === settings.groupFilters.load())
+    if(false === settings.getFilterObject("group").load())
       alert("Failed to reset settings!");
     return true;
   };

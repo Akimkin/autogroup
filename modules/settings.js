@@ -1,94 +1,118 @@
 var EXPORTED_SYMBOLS = ["autoGroupSettings"];
 
-/*
+/**
  * autoGroupSettings module
+ * TODO: check whether the replace of typeof-checks with === against undefined is sufficient
  */
-if("undefined" === typeof(autoGroupSettings)){
-  var autoGroupSettings = {};
-  (function(){
-    
-    var prefManager = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("extensions.autogroup.");
-    var _data = undefined;
-    
-    var _isArray = function(x)
-    {
-      return ( "object" === typeof(x) )  && ( "Array" === x.constructor.name );
-    }
-    
-    this.data = function()
-    {
-      if("undefined" === typeof(_data))
-	this.load();
-      return _data;
-    };
-    
-    this.load = function()
-    {
-      var fs = prefManager.getComplexValue("groups", Components.interfaces.nsISupportsString).data;
-      try {
-	_data = (JSON.parse(fs));
-	
-	if ( !_isArray( _data ) ) throw(1);
+if ("undefined" === typeof autoGroupSettings) {
+    var autoGroupSettings = {};
+    (function() {
+        var prefManager = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("extensions.autogroup.");
 
-	// Check for correct data
-	for(var i = 0; i < _data.length; i++)
-	{
-	  if( "string" !== typeof _data[i].groupName ) throw(2);
+        var _isArray = function(x) {
+            return ("object" === typeof x) && ("Array" === x.constructor.name);
+        };
 
-	  if( !_isArray( _data[i].groupFilters ) ) throw(3);
+        /**
+         * _filterQueries - filter query objects
+         * @type {{group: {prefVar: string, checkFilter: Function, validate: Function}, nogroup: {prefVar: string, checkFilter: Function, validate: Function}}}
+         * @private
+         */
+        var _filterQueries = {
+            group: {
+                prefVar: "groups",
+                checkFilter:  function(fl) {
+                    return ("string" === typeof fl.fName) && ("undefined" !== typeof fl.fgType)
+                        && ("undefined" !== typeof fl.fsType) && ("string" === typeof fl.fCheck);
+                },
+                validate: function(data) {
+                    if (!_isArray(data)) {
+                        return false;
+                    }
 
-	  for(var t = 0; t < _data[i].groupFilters.length; t++)
-	  {
-	    var fl = _data[i].groupFilters[t];
-	    if( ( "string" !== typeof fl.fName ) || ( "undefined" === typeof fl.fgType ) || ( "undefined" === typeof fl.fsType ) || ( "string" !== typeof fl.fCheck ) )
-	    	throw(4);
-	  }
-	  
-	}
-	
-      }
-      catch(e) {
-	_data = undefined;
-	return false;
-      }
-      
-      return true;
-    };
-    
-    this.save = function(newData, commit)
-    {
-      if ( !_isArray( newData ) ) throw(1);
-      _data = newData;
-      if( commit )
-	this.commit();
-    };
-    
-    this.commit = function()
-    {
-      // Check for correct data
-      for( var i = 0; i < _data.length; i++ )
-      {
-	if ( !_isArray( _data ) ) throw(1);
+                    return data.every(function(group) {
+                        if ("string" !== typeof group.groupName) {
+                            return false;
+                        }
 
-	if(typeof _data[i].groupName !== "string") throw(2);
+                        if (!_isArray(group.groupFilters)) {
+                            return false;
+                        }
 
-	if( !_isArray( _data[i].groupFilters ) )
-	{
-	  throw(3);
-	}
-   
-	for( var t = 0; t < _data[i].groupFilters.length; t++ )
-	{
-	  var fl = _data[i].groupFilters[t];
-	  if( ( "string" !== typeof fl.fName ) || ( "undefined" === typeof fl.fgType ) || ( "undefined" === typeof fl.fsType ) || ( "string" !== typeof fl.fCheck ) )
-	  	throw(4);
-	}
-      }
-      
-      var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
-      str.data = ( JSON.stringify( _data ) );
-      prefManager.setComplexValue("groups", Components.interfaces.nsISupportsString, str);
-      this.load();
-    };
-  }).apply(autoGroupSettings);
+                        return group.groupFilters.every(_filterQueries.group.checkFilter);
+                    });
+                }
+            },
+            nogroup: {
+                prefVar: "nogroup",
+                checkFilter:  function(fl) {
+                    return ("string" === typeof fl.fName) && ("undefined" !== typeof fl.fgType) && ("undefined" !== typeof fl.fsType) && ("string" === typeof fl.fCheck);
+                },
+                validate: function(data) {
+                    return data.every(_filterQueries.nogroup.checkFilter);
+                }
+            }
+        };
+
+        var _requestedFilterObjects = {};
+
+        this.getFilterObject = function (filter_type) {
+            if (!(filter_type in _filterQueries)) {
+                throw ("Filter object of unknown type '" + filter_type.toString() + "' requested");
+            }
+
+            if (filter_type in _requestedFilterObjects) {
+                return _requestedFilterObjects[filter_type];
+            }
+
+            /**
+             * Filter access object
+             */
+            var filterProvider = {};
+            (function() {
+                var _data = undefined;
+                var _query = _filterQueries[filter_type];
+
+                this.data = function() {
+                    if ("undefined" === typeof(_data)) {
+                        this.load();
+                    }
+                    return _data;
+                };
+
+                this.load = function() {
+                    var prefString = prefManager.getComplexValue(_query.prefVar, Components.interfaces.nsISupportsString).data;
+                    _data = (JSON.parse(prefString));
+
+                    if (!_query.validate(_data)) {
+                        _data = undefined;
+                        throw ("[" + filter_type.toString() + "] Data validation failed");
+                    }
+                };
+
+                this.save = function(newData, commit) {
+                    if (!_isArray(newData)) {
+                        throw ("[" + filter_type.toString() + "] Bad format of filter data!");
+                    }
+                    _data = newData;
+                    if (commit) {
+                        this.commit();
+                    }
+                };
+
+                this.commit = function() {
+                    if (!_query.validate(_data)) {
+                        throw ("[" + filter_type.toString() + "] Data validation failed");
+                    }
+
+                    var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
+                    str.data = (JSON.stringify(_data));
+                    prefManager.setComplexValue(_query.prefVar, Components.interfaces.nsISupportsString, str);
+                    this.load();
+                }
+            }).apply(filterProvider);
+            _requestedFilterObjects[filter_type] = filterProvider;
+            return filterProvider;
+        };
+    }).apply(autoGroupSettings);
 }
