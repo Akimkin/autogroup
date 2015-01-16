@@ -46,7 +46,8 @@ if ("undefined" === typeof autoGroupSettings) {
             nogroup: {
                 prefVar: "nogroup",
                 checkFilter:  function(fl) {
-                    return ("string" === typeof fl.fName) && ("undefined" !== typeof fl.fgType) && ("undefined" !== typeof fl.fsType) && ("string" === typeof fl.fCheck);
+                    return ("string" === typeof fl.fName) && ("undefined" !== typeof fl.fgType)
+                        && ("undefined" !== typeof fl.fsType) && ("string" === typeof fl.fCheck);
                 },
                 validate: function(data) {
                     return data.every(_filterQueries.nogroup.checkFilter);
