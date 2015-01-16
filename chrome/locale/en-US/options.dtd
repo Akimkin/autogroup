@@ -26,3 +26,4 @@
 <!ENTITY pane-nogroup.title "Do Not Group">
 <!ENTITY nogrouplist.explain "The tabs matching following filters will always open icurrent group">
 <!ENTITY nogrouplist.label "Filters">
+<!ENTITY nogrouplist.accesskey "F">

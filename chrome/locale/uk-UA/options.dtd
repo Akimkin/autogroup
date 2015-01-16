@@ -26,3 +26,4 @@
 <!ENTITY pane-nogroup.title "Не групувати">
 <!ENTITY nogrouplist.explain "Вкладки, що підходять цим фільтрам буде відкрито у поточній групі">
 <!ENTITY nogrouplist.label "Фільтри">
+<!ENTITY nogrouplist.accesskey "Ф">

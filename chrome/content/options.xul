@@ -13,7 +13,7 @@
     <prefpane id="autogroup-pane-groups" image='chrome://autogroup/skin/view-group.png' label="&pane-groups.title;">
         <label accesskey="&grouplist.accesskey;" control="group-list">&grouplist.label;</label>
         <!-- Group list -->
-        <tree id="group-list" rows="12" flex="1" hidecolumnpicker="true" seltype="single" class="tree" onselect='autoGroupOpts.treeItemSelected(this);'>
+        <tree id="group-list" rows="12" flex="1" hidecolumnpicker="true" seltype="single" class="tree" onselect=''>
             <treecols>
                 <treecol primary="true" ordinal="1" flex="1" label='&grouplist.label;' />
             </treecols>
@@ -24,11 +24,9 @@
         <!-- Buttons -->
         <hbox align="right">
         <!-- Move selected element up -->
-            <button label="&grouplist.moveup;" id='btn-group-up'
-                            oncommand="autoGroupOpts.treeMoveUp('//xul:prefpane[@id=\'autogroup-pane-groups\']/xul:tree[@id=\'group-list\']')" />
+            <button label="&grouplist.moveup;" id='btn-group-up' oncommand="" />
             <!-- Move selected element down -->
-            <button label="&grouplist.movedown;" id='btn-group-down'
-                            oncommand="autoGroupOpts.treeMoveDown('//xul:prefpane[@id=\'autogroup-pane-groups\']/xul:tree[@id=\'group-list\']')" />
+            <button label="&grouplist.movedown;" id='btn-group-down' oncommand="" />
             <!-- Remove selected element -->
             <button label="&grouplist.remove;" id='btn-group-remove' icon="remove" oncommand="" />
         </hbox>
@@ -69,7 +67,7 @@
 
     <!-- Do-not-group filters pane -->
     <prefpane id="autogroup-pane-nogroup" image='chrome://autogroup/skin/view-nogroup.png' label="&pane-nogroup.title;">
-        <label accesskey="&grouplist.accesskey;" control="nogroup-list">&nogrouplist.label;</label>
+        <label accesskey="&nogrouplist.accesskey;" control="nogroup-list">&nogrouplist.label;</label>
         <listbox id="nogroup-list" rows="12" flex="1" hidecolumnpicker="true" seltype="single" class="tree" onselect='autoGroupOpts.treeItemSelected(this);'>
             <listhead>
                 <listheader label="&grouplist.label;" />
@@ -91,7 +89,7 @@
         </hbox>
 
         <!-- Name-editing textbox -->
-        <label control='object_name' id='obj-name'>&epan.groupname;</label>
+        <label control='object_name' id='obj-name'>&epan.filtername;</label>
         <textbox id='object_name' />
 
         <!-- Filter-related box -->
@@ -126,6 +124,11 @@
 
     <script type='text/javascript'>
         var f;
+        window.document.getElementById('autogroup-pane-groups').addEventListener("load", f = function() {
+            autoGroupOpts.getPaneController('group').onLoad();
+            window.document.getElementById('autogroup-pane-groups').removeEventListener("load", f, true);
+        }, true);
+        /*var f;
         window.addEventListener("load", f = function() {
             var instant = document.getElementById('autogroup-preferences').instantApply;
             autoGroupOpts.immediateState(instant);
@@ -138,7 +141,7 @@
             console.log(groupListIter.iterateNext());
             tr.view.selection.select(tr.view.rowCount-1);
             window.removeEventListener("load", f, true);
-        }, true);
+        }, true);*/
     </script>
 </prefwindow>
 
