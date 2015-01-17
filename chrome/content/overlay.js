@@ -11,8 +11,6 @@ if("undefined" === typeof(autogroup)){
 //         .logStringMessage(str);
 //     };
 
-    // TODO: implement checks for filters: nogroup goes first
-
     var _executeSoon = function(aFunc) {
         var tm = Components.classes['@mozilla.org/thread-manager;1'].getService(Components.interfaces.nsIThreadManager);
 
@@ -23,10 +21,6 @@ if("undefined" === typeof(autogroup)){
         }, Ci.nsIThread.DISPATCH_NORMAL);
     };
 
-    var _iterateArray = function(arr) {
-
-    }
-    
     this.onLoad = function() {
         // initialization code
         this.initialized = true;
@@ -44,91 +38,111 @@ if("undefined" === typeof(autogroup)){
         const FILTER_URI = 0;
         const FILTER_TITLE = 1;
 
-        //var nogroup = autoGroupSettings.noGroupFilters.data();
+        var nogroup = autoGroupSettings.getFilterObject("nogroup").data();
         var groups = autoGroupSettings.getFilterObject("group").data();
         window.TabView._initFrame();
         contentWindow = window.TabView.getContentWindow();
 
-        if ("undefined" !== typeof groups) {
-            for(var i = 0; i < groups.length; i++)
-            {
-                for(var t = 0; t < groups[i].groupFilters.length; t++)
-                {
-                    var fl = groups[i].groupFilters[t];
-                    var sst = "";                 // String to search in
-                    var sr = null;                // Object to search for
-                    var mv = false;               // Perform tab movement
+        var checkFilterMatch = function(filter) {
+            var subject = "";
+            var search_expr = null;
+            var matches = false;
 
-                    switch(fl.fgType)
-                    {
-                        case FILTER_URI:
-                            sst = gBrowser.getBrowserForTab(tab).currentURI.spec;
-                        break;
-                        case FILTER_TITLE:
-                            sst = gBrowser.getBrowserForTab(tab).contentDocument.title;
-                        break;
-                    }
-                    
-                    switch(fl.fsType)
-                    {
-                        case FILTER_REGEX:
-                            sr = new RegExp(fl.fCheck, "i");
-                            if(sr.test(sst))
-                                mv = true;
-                        break;
-                        case FILTER_FULLTEXT:
-                            sr = fl.fCheck;
-                            if(sst.toLowerCase().indexOf(sr.toLowerCase()) != -1)
-                            mv = true;
-                        break;
-                    }
-                    // No filter match - continue
-                    if(!mv) continue;
-                    // Move tab
-                    var g;
-                    var eg = contentWindow.GroupItems.groupItems.filter(function(groupItem){ return groupItem.getTitle() == groups[i].groupName });
-                    if(eg.length == 0)
-                    {
-                        g = contentWindow.GroupItems.newGroup();
-                        g.setTitle(groups[i].groupName);
-                    }else
-                        g = eg[0];
-                    // Perform check if we really need to switch to new tab
-                    if(g.getChildren().filter(function(tabItem){ return tabItem.tab === tab }).length == 0)
-                    {
-                        window.parent.TabView.moveTabTo(tab, g.id);
-                        gBrowser.selectedTab = tab;
-                    }
-                    return true;
-                }
+            switch (filter.fgType) {
+                case FILTER_URI:
+                    subject = gBrowser.getBrowserForTab(tab).currentURI.spec;
+                    break;
+                case FILTER_TITLE:
+                    subject = gBrowser.getBrowserForTab(tab).contentDocument.title;
+                    break;
             }
+
+            switch (filter.fsType) {
+                case FILTER_REGEX:
+                    search_expr = new RegExp(filter.fCheck, "i");
+                    if (search_expr.test(subject)) {
+                        matches = true;
+                    }
+                    break;
+                case FILTER_FULLTEXT:
+                    search_expr = filter.fCheck;
+                    if (subject.toLowerCase().indexOf(search_expr.toLowerCase()) != -1) {
+                        matches = true;
+                    }
+                    break;
+            }
+            return matches;
+        };
+
+        var moveTabToGroup = function(group) {
+            var target;
+            var existing_groups = contentWindow.GroupItems.groupItems.filter(function(groupItem) {
+                return groupItem.getTitle() == group.groupName
+            });
+
+            if(existing_groups.length == 0) {
+                target = contentWindow.GroupItems.newGroup();
+                target.setTitle(group.groupName);
+            } else {
+                target = existing_groups[0];
+            }
+
+            // Perform check if we really need to switch to new tab
+            var isTabInGroup = function(tab_item) {
+                return tab_item.tab === tab
+            };
+
+            if (!target.getChildren().some(isTabInGroup)) {
+                window.parent.TabView.moveTabTo(tab, target.id);
+                gBrowser.selectedTab = tab;
+            }
+            return true;
+        };
+
+        if ("undefined" !== typeof groups) {
+            if (nogroup.some(checkFilterMatch)) {
+                return true;
+            }
+
+            groups.every(function(group) {
+                if (group.groupFilters.some(checkFilterMatch)) {
+                    moveTabToGroup(group);
+                    return false;
+                }
+                return true;
+            });
         }
         return false;
     };
-    
+
     this.onTabOpen = function(e) {
-        gBrowser.getBrowserForTab(e.target).addEventListener("load", function(){ autogroup.checkFilters(e.target); }, true);
+        gBrowser.getBrowserForTab(e.target).addEventListener("load", function() {
+            autogroup.checkFilters(e.target);
+        }, true);
     };
 
     this.onTabClose = function(e) {
-        var eg = window.parent.TabView.getContentWindow().GroupItems;
-        var g = eg.getActiveGroupItem();
+        var window_groups = window.parent.TabView.getContentWindow().GroupItems;
+        var active_window_group = window_groups.getActiveGroupItem();
         // HACK: seems dirty but works as expected
         _executeSoon(function() {
-            if(g.getChildren().length == 0) {
+            if(active_window_group.getChildren().length == 0) {
                 // Check if group is listed in group-list to avoid closing user-created groups.
                 // Don't close unnamed groups (Firefox does this itself).
-                var title = g.getTitle();
-                if(title.length > 0) {
+                var title = active_window_group.getTitle();
+                if (title.length > 0) {
                     var groups = autoGroupSettings.getFilterObject("group").data();
-                    if( "undefined" === typeof groups ) return;
-                    if(groups.filter(function(item) { return item.groupName == title }).length > 0) {
-                        g.setTitle("");
-                        if(!g.closeIfEmpty()) {
-                            g.setTitle(title);
+                    if ( "undefined" === typeof groups ) {
+                        return;
+                    }
+
+                    if (groups.some(function(item) { return item.groupName == title })) {
+                        active_window_group.setTitle("");
+                        if (!active_window_group.closeIfEmpty()) {
+                            active_window_group.setTitle(title);
                         }
                         // Perform switching to previously viewed group
-                        eg.setActiveGroupItem(eg.groupItems[eg.groupItems.length-1]);
+                        window_groups.setActiveGroupItem(window_groups.groupItems[window_groups.groupItems.length - 1]);
                         window.parent.TabView.hide();
                     }
                 }

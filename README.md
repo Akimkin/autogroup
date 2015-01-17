@@ -18,6 +18,9 @@ Each filter has following parameters:
 If tab matches filters for several groups, it will be placed to the first matching group.
 You can manually sort groups in order of their priority (first group's filters will be checked first) via AutoGroup settings dialog.
 
+There's also a "Do not group" filter list which allows to set filters for tabs that must be left in **current** group.
+Tabs matching such filters will never be moved to another group.
+
 By default, tab that doesn't match any of group filters will be opened in current active group.
 If you want to explicitly define default group for tabs that don't match any other groups, create group, place it last in the group list and add group filter with following data:
 
@@ -25,4 +28,3 @@ If you want to explicitly define default group for tabs that don't match any oth
  - Search in: any
  - Expression: .* 
 
-Together with the previous default group, tab that does match a group filter with group name equal to #CURRENT# will be opened in current active group (this group must be placed **first**).
