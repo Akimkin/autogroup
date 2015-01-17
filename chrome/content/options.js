@@ -64,7 +64,7 @@ if ("undefined" === typeof(autoGroupOpts)) {
                 return window.document.evaluate(path, root, xulNsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
             };
 
-            this.delete = function(root, path) {
+            /* this.delete = function(root, path) {
                 var found = [];
                 var res = null;
                 var elemIter = window.document.evaluate(path, root, xulNsResolver, XPathResult.ANY_TYPE, null);
@@ -72,7 +72,7 @@ if ("undefined" === typeof(autoGroupOpts)) {
                 while (res = elemIter.iterateNext()) {
                     // NOTE: do we need it at all?
                 }
-            };
+            };*/
         };
 
         var immediateState = function(state) {
@@ -86,6 +86,7 @@ if ("undefined" === typeof(autoGroupOpts)) {
          */
         var _controllerFeatures = {
             group: new function() {
+                // TODO: avoid rebuilding tree whenever possible
                 var data_provider = settings.getFilterObject("group");
 
                 var ui_list_path = "//xul:prefpane[@id='autogroup-pane-groups']/xul:tree[@id='group-list']";
@@ -226,7 +227,11 @@ if ("undefined" === typeof(autoGroupOpts)) {
                     filter.fName = in_objname.value;
                     filter.fsType = sel_filter_match.selectedIndex;
                     filter.fgType = sel_filter_search.selectedIndex;
-                    filter.fCheck = in_filter_expr.value;
+                    if (in_filter_expr.value) {
+                        filter.fCheck = in_filter_expr.value;
+                    } else {
+                        alert(locale_strings.getString('alertNotSavingEmptyExpr'));
+                    }
                     // Save data
                     data_provider.save(data, immediate);
                     // Rebuild list
@@ -254,7 +259,6 @@ if ("undefined" === typeof(autoGroupOpts)) {
 
                 var setSelectionMode = function(selection, input) {
                     var data = data_provider.data();
-                    in_objname = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-groups']/xul:textbox[@id='object_name']");
                     var label_objname = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-groups']/xul:label[@id='obj-name']");
 
                     if ('group' == selection) {
@@ -510,7 +514,7 @@ if ("undefined" === typeof(autoGroupOpts)) {
                     try {
                         data_provider.commit();
                     } catch(e) {
-                        alert("Failed to save settings (" + e.toString() + ")!");
+                        alert("[Group] Failed to save settings (" + e.toString() + ")!");
                         return false;
                     }
                     return true;
@@ -518,7 +522,7 @@ if ("undefined" === typeof(autoGroupOpts)) {
 
                 this.discard = function() {
                     if (false === data_provider.load()) {
-                        alert("Failed to reset settings!");
+                        alert("[Group] Failed to reset settings!");
                     }
                     return true;
                 };
@@ -534,6 +538,7 @@ if ("undefined" === typeof(autoGroupOpts)) {
                     tree = dom_helper.get(window.document, ui_list_path);
                     // Get filter input controls
                     box_filter = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-groups']/xul:vbox[@id='filter-box']");
+                    in_objname = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-groups']/xul:textbox[@id='object_name']");
                     in_filter_expr = dom_helper.get(box_filter, "//xul:textbox[@id='f_expression']");
                     sel_filter_match = dom_helper.get(box_filter, "//xul:radiogroup[@id='match-select']");
                     sel_filter_search = dom_helper.get(box_filter, "//xul:radiogroup[@id='search-select']");
@@ -584,43 +589,226 @@ if ("undefined" === typeof(autoGroupOpts)) {
                 var sel_filter_search;
                 var box_filter;
 
+                var buildList = function() {
+                    var data = data_provider.data();
+
+                    filter_list.disabled = true;
+                    // Clear current items
+                    var row_count = filter_list.getRowCount();
+                    for (var i = 0; i < row_count; i++) {
+                        // NOTE: items should be deleted from bottom to top in order to avoid indexing troubles
+                        filter_list.removeItemAt(row_count - 1 - i);
+                    }
+
+                    data.every(function(filter) {
+                        // TODO: check if just appendItem() could be used here
+                        var filter_item = dom_helper.create(null, null, 'listitem');
+                        var filter_cell = dom_helper.create(null, null, 'listcell', {
+                            'label': (filter.fName.length > 0) ? filter.fName : ('(' + locale_strings.getString('unNamedFilter') + ')')
+                        });
+                        filter_item.appendChild(filter_cell);
+                        filter_list.appendChild(filter_item);
+                        return true;
+                    });
+                    // Add "+New"-cell for adding new filters
+                    var new_item = dom_helper.create(null, null, 'listitem');
+                    var new_cell = dom_helper.create(null, null, 'listcell', {
+                        'label': '(+) ' + locale_strings.getString('newFilterCaption')
+                    });
+                    new_item.appendChild(new_cell);
+                    filter_list.appendChild(new_item);
+                    filter_list.disabled = false;
+                };
+
+                var setInputMode = function(mode) {
+                    var data = data_provider.data();
+                    if ("edit" == mode) {
+                        input_mode = mode;
+                        btn_addsave.label = locale_strings.getString('editButtonCaption');
+                        btn_addsave.setAttribute('icon', 'apply');
+                        var filter = data[filter_list.currentIndex];
+                        in_objname.value = filter.fName;
+                        in_filter_expr.value = filter.fCheck;
+                        sel_filter_match.selectedIndex = filter.fsType;
+                        sel_filter_search.selectedIndex = filter.fgType;
+                        btn_remove.disabled = false;
+                        btn_up.disabled = (filter_list.selectedIndex <= 0);
+                        btn_down.disabled = (filter_list.selectedIndex >= data.length - 1);
+                    } else if ("add" == mode) {
+                        input_mode = mode;
+                        in_objname.value = locale_strings.getString('newFilterName');
+                        btn_addsave.label = locale_strings.getString('addButtonCaption');
+                        btn_addsave.setAttribute('icon', 'add');
+                        in_filter_expr.value = '';
+                        sel_filter_match.selectedIndex = 1;
+                        sel_filter_search.selectedIndex = 0;
+                        btn_remove.disabled = true;
+                        btn_up.disabled = true;
+                        btn_down.disabled = true;
+                    } else {
+                        throw ("Unknown input mode was attempted to be set (input_mode=" + mode.toString() + ")");
+                    }
+                };
+
+                var addFilter = function() {
+                    // Get group data
+                    var data = data_provider.data();
+                    var filter_expr = in_filter_expr.value;
+
+                    // Check for empty expressions
+                    if (!filter_expr.replace(/(^\s+)|(\s+$)/g, "")) {
+                        return;
+                    }
+                    var curr_idx = filter_list.selectedIndex;
+                    // Update data
+                    data.push({
+                        'fName':  in_objname.value,
+                        'fsType': sel_filter_match.selectedIndex,
+                        'fgType': sel_filter_search.selectedIndex,
+                        'fCheck': filter_expr
+                    });
+
+                    // Save data
+                    data_provider.save(data, immediate);
+                    // Refresh tree
+                    buildList();
+                    filter_list.selectedIndex = curr_idx;
+                };
+
+                var editFilter = function() {
+                    // Get group data
+                    var data = data_provider.data();
+                    var curr_idx = filter_list.selectedIndex;
+                    // Update filter data
+                    var filter = data[curr_idx];
+                    filter.fName = in_objname.value;
+                    filter.fsType = sel_filter_match.selectedIndex;
+                    filter.fgType = sel_filter_search.selectedIndex;
+                    if (in_filter_expr.value) {
+                        filter.fCheck = in_filter_expr.value;
+                    } else {
+                        alert(locale_strings.getString('alertNotSavingEmptyExpr'));
+                    }
+                    // Save data
+                    data_provider.save(data, immediate);
+                    // NOTE: firstChild is for accessing tree cell
+                    filter_list.selectedItem.firstChild.setAttribute('label', filter.fName);
+                    filter_list.selectedIndex = curr_idx;
+                };
+
+                var swapFilters = function(current_idx, new_idx) {
+                    // Get group data
+                    var data = data_provider.data();
+                    // Check bounds
+                    if ((new_idx < 0) || (new_idx > data.length - 1)) {
+                        return;
+                    }
+                    // Swap filters
+                    var tmp = data[current_idx];
+                    data[current_idx] = data[new_idx];
+                    data[new_idx] = tmp;
+                    // Save data
+                    data_provider.save(data, immediate);
+                    // Update list
+                    filter_list.getItemAtIndex(current_idx).firstChild.setAttribute('label', data[current_idx].fName);
+                    filter_list.getItemAtIndex(new_idx).firstChild.setAttribute('label', data[new_idx].fName);
+                    filter_list.selectedIndex = new_idx;
+                };
+
                 this.moveup = function() {
+                    swapFilters(filter_list.selectedIndex, filter_list.selectedIndex - 1);
                 };
 
                 this.movedown = function() {
+                    swapFilters(filter_list.selectedIndex, filter_list.selectedIndex + 1);
+                };
+
+                this.remove = function() {
+                    // Get group data
+                    var data = data_provider.data();
+                    var curr_idx = filter_list.selectedIndex;
+                    // Remove selected filter
+                    data.splice(curr_idx, 1);
+                    // Save data
+                    data_provider.save(data, immediate);
+                    filter_list.removeItemAt(curr_idx);
+                    filter_list.selectedIndex = (curr_idx > 0) ? (curr_idx - 1) : curr_idx;
                 };
 
                 this.submit = function() {
-                    // TODO: add filter
+                    if ('edit' == input_mode) {
+                        editFilter();
+                    } else if ('add' == input_mode) {
+                        addFilter();
+                    } else {
+                        throw ("Unknown input mode set (input_mode=" + mode.toString() + ")");
+                    }
                 };
 
                 this.select = function() {
-                    // TODO: load filter
+                    if ((filter_list.selectedIndex >= 0) && (filter_list.selectedIndex < filter_list.getRowCount() - 1)) {
+                        setInputMode('edit');
+                    } else {
+                        setInputMode('add');
+                    }
                 };
 
                 this.accept = function() {
+                    try {
+                        data_provider.commit();
+                    } catch(e) {
+                        alert("[NoGroup] Failed to save settings (" + e.toString() + ")!");
+                        return false;
+                    }
+                    return true;
                 };
 
                 this.discard = function() {
+                    if (false === data_provider.load()) {
+                        alert("[NoGroup] Failed to reset settings!");
+                    }
+                    return true;
                 };
 
                 this.load = function() {
                     // Load localized strings
                     locale_strings = dom_helper.get(window.document, '//*[@id="autogroup-opts-string-bundle"]');
                     // Get dialog control objects
-                    btn_addsave = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/*/xul:button[@id='btn-group-addsave']");
-                    btn_remove = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/*/xul:button[@id='btn-group-remove']");
-                    btn_up = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/*/xul:button[@id='btn-group-up']");
-                    btn_down = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/*/xul:button[@id='btn-group-down']");
+                    btn_addsave = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/*/xul:button[@id='btn-nogroup-addsave']");
+                    btn_remove = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/*/xul:button[@id='btn-nogroup-remove']");
+                    btn_up = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/*/xul:button[@id='btn-nogroup-up']");
+                    btn_down = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/*/xul:button[@id='btn-nogroup-down']");
                     filter_list = dom_helper.get(window.document, ui_list_path);
                     // Get filter input controls
-                    box_filter = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-groups']/xul:vbox[@id='filter-box']");
-                    in_filter_expr = dom_helper.get(box_filter, "//xul:textbox[@id='f_expression']");
-                    sel_filter_match = dom_helper.get(box_filter, "//xul:radiogroup[@id='match-select']");
-                    sel_filter_search = dom_helper.get(box_filter, "//xul:radiogroup[@id='search-select']");
+                    box_filter = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/xul:vbox[@id='filter-box']");
+
+                    in_objname = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/xul:textbox[@id='object_name']");
+                    in_filter_expr = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/xul:vbox[@id='filter-box']/xul:textbox[@id='f_expression']");
+                    sel_filter_match = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/xul:vbox[@id='filter-box']/*/*/xul:radiogroup[@id='match-select']");
+                    sel_filter_search = dom_helper.get(window.document, "//xul:prefpane[@id='autogroup-pane-nogroup']/xul:vbox[@id='filter-box']/*/*/xul:radiogroup[@id='search-select']");
                     // Set instant apply property
                     var instant = dom_helper.get(window.document, '//*[@id="autogroup-preferences"]').instantApply;
                     immediateState(instant);
+
+                    // Load settings
+                    try {
+                        data_provider.load();
+                    } catch (e) {
+                        alert("An error occurred when loading settings:\n" + e.toString());
+                        return;
+                    }
+
+                    // Build filter list
+                    buildList();
+
+                    // Set event handlers to controls
+                    filter_list.addEventListener('select', this.select);
+                    btn_addsave.addEventListener('click', this.submit);
+                    btn_remove.addEventListener('click', this.remove);
+                    btn_up.addEventListener('click', this.moveup);
+                    btn_down.addEventListener('click', this.movedown);
+
+                    filter_list.selectedIndex = filter_list.getRowCount() - 1;
                 };
             }
         };
@@ -683,7 +871,8 @@ if ("undefined" === typeof(autoGroupOpts)) {
                 };
 
                 this.onDiscard = function() {
-                    return paneCall('discard');
+                    paneCall('discard');
+                    return true;
                 }
             }).apply(controller);
             _requestedControllers[pane] = controller;
@@ -692,7 +881,10 @@ if ("undefined" === typeof(autoGroupOpts)) {
 
         this.accept = function(){
             return Object.keys(_requestedControllers).every(function(key) {
-                return _requestedControllers[key].onAccept();
+                if (false === _requestedControllers[key].onAccept()) {
+                    alert(locale_strings.getFormattedString('alertAcceptSettingsFailed', [key.toString()]));
+                }
+                return true;
             });
         };
 
