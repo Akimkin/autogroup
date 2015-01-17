@@ -70,7 +70,7 @@
         <label accesskey="&nogrouplist.accesskey;" control="nogroup-list">&nogrouplist.label;</label>
         <listbox id="nogroup-list" rows="12" flex="1" hidecolumnpicker="true" seltype="single" class="tree" onselect=''>
             <listhead>
-                <listheader label="&grouplist.label;" />
+                <listheader label="&nogrouplist.label;" />
             </listhead>
             <listcols>
                 <listcol flex="1" />
@@ -132,20 +132,6 @@
             autoGroupOpts.getPaneController('nogroup').onLoad();
             window.document.getElementById('autogroup-pane-nogroup').removeEventListener("load", nogroup_load_handler, true);
         }, true);
-        /*var f;
-         window.addEventListener("load", f = function() {
-         var instant = document.getElementById('autogroup-preferences').instantApply;
-         autoGroupOpts.immediateState(instant);
-         var tr = document.getElementById('group-list');
-         tr.disabled = true;
-         autoGroupOpts.buildTree(tr);
-         tr.disabled = false;
-         var nsResolver = function(x) { return "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";}
-         var groupListIter = document.evaluate('//xul:tree[@id="group-list"]', document, nsResolver, XPathResult.ANY_TYPE, null);
-         console.log(groupListIter.iterateNext());
-         tr.view.selection.select(tr.view.rowCount-1);
-         window.removeEventListener("load", f, true);
-         }, true);*/
     </script>
 </prefwindow>
 
