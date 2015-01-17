@@ -49,6 +49,10 @@ if ("undefined" === typeof autoGroupSettings) {
                         && ("undefined" !== typeof fl.fsType) && ("string" === typeof fl.fCheck);
                 },
                 validate: function(data) {
+                    if (!_isArray(data)) {
+                        return false;
+                    }
+
                     return data.every(_filterQueries.nogroup.checkFilter);
                 }
             }
