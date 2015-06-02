@@ -1,0 +1,11 @@
+#autogroup-pane-nogroup, #autogroup-pane-groups
+{
+  min-height: 540px;
+  min-width: 360px;
+}
+
+vbox.autogroup-preset-list
+{
+  height: 15em;
+}
+
