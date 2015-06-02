@@ -41,7 +41,7 @@ if("undefined" === typeof(autogroup)){
         var nogroup = autoGroupSettings.getFilterObject("nogroup").data();
         var groups = autoGroupSettings.getFilterObject("group").data();
         window.TabView._initFrame();
-        contentWindow = window.TabView.getContentWindow();
+        var contentWindow = window.TabView.getContentWindow();
 
         var checkFilterMatch = function(filter) {
             var subject = "";
