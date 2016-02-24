@@ -122,15 +122,15 @@
 
     <script type='text/javascript'>
         var group_load_handler;
-        window.document.getElementById('autogroup-pane-groups').addEventListener("load", group_load_handler = function () {
+        window.document.addEventListener("load", group_load_handler = function () {
             autoGroupOpts.getPaneController('group').onLoad();
-            window.document.getElementById('autogroup-pane-groups').removeEventListener("load", group_load_handler, true);
+            window.document.removeEventListener("load", group_load_handler, true);
         }, true);
 
         var nogroup_load_handler;
-        window.document.getElementById('autogroup-pane-nogroup').addEventListener("load", nogroup_load_handler = function () {
+        window.document.addEventListener("load", nogroup_load_handler = function () {
             autoGroupOpts.getPaneController('nogroup').onLoad();
-            window.document.getElementById('autogroup-pane-nogroup').removeEventListener("load", nogroup_load_handler, true);
+            window.document.removeEventListener("load", nogroup_load_handler, true);
         }, true);
     </script>
 </prefwindow>
