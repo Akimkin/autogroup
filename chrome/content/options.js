@@ -263,7 +263,7 @@ if ("undefined" === typeof(autoGroupOpts)) {
 
                     if ('group' == selection) {
                         selection_mode = selection;
-                        box_filter.style.display = 'none';
+                        box_filter.style.visibility = 'hidden';
                         label_objname.value = locale_strings.getString('groupName');
                         if ('edit' == input) {
                             input_mode = input;
@@ -284,7 +284,7 @@ if ("undefined" === typeof(autoGroupOpts)) {
                         }
                     } else if ('filter' == selection) {
                         selection_mode = selection;
-                        box_filter.style.display = '';
+                        box_filter.style.visibility = '';
                         label_objname.value = locale_strings.getString('filterName');
                         if ('edit' == input) {
                             input_mode = input;

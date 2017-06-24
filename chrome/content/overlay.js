@@ -11,6 +11,10 @@ if("undefined" === typeof(autogroup)){
 //         .logStringMessage(str);
 //     };
 
+    // Content frame init
+    var globalMM = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
+    globalMM.loadFrameScript("chrome://autogroup/content/frame-script.js", true);
+
     var _executeSoon = function(aFunc) {
         var tm = Components.classes['@mozilla.org/thread-manager;1'].getService(Components.interfaces.nsIThreadManager);
 
@@ -29,7 +33,7 @@ if("undefined" === typeof(autogroup)){
         gBrowser.tabContainer.addEventListener("TabClose", autogroup.onTabClose, false);
     };
 
-    this.checkFilters = function(tab) {
+    this.checkFilters = function(tab, data) {
         // Fitler search types
         const FILTER_REGEX = 0;
         const FILTER_FULLTEXT = 1;
@@ -50,10 +54,10 @@ if("undefined" === typeof(autogroup)){
 
             switch (filter.fgType) {
                 case FILTER_URI:
-                    subject = gBrowser.getBrowserForTab(tab).currentURI.spec;
+                    subject = data.url;
                     break;
                 case FILTER_TITLE:
-                    subject = gBrowser.getBrowserForTab(tab).contentDocument.title;
+                    subject = data.title;
                     break;
             }
 
@@ -116,9 +120,12 @@ if("undefined" === typeof(autogroup)){
     };
 
     this.onTabOpen = function(e) {
-        gBrowser.getBrowserForTab(e.target).addEventListener("load", function() {
-            autogroup.checkFilters(e.target);
-        }, true);
+        var tab = e.target;
+        globalMM.addMessageListener("autogroup-tab-load", function(msg) {
+            if (gBrowser.getBrowserForTab(tab) === msg.target) {
+                autogroup.checkFilters(tab, msg.data);
+            }
+        });
     };
 
     this.onTabClose = function(e) {
